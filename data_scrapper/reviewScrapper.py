@@ -2,6 +2,7 @@ from google_play_scraper import reviews, app
 from datetime import datetime, timedelta
 import json
 import time
+import os
 
 # --- Constants ---
 LANG = 'en'
@@ -82,7 +83,11 @@ def scrape_app_reviews(app_id):
         }
 
         file_name = f'{app_id}_grouped_reviews.json'
-        with open(file_name, 'w', encoding='utf-8') as f:
+        directory = 'data_scrapper/app_data'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        path = os.path.join(directory, file_name)
+        with open(path, 'w', encoding='utf-8') as f:
             json.dump(output, f, ensure_ascii=False, indent=2)
 
         print(f"\n✅ Done! Saved to '{file_name}'")

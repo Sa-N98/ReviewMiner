@@ -1,6 +1,7 @@
 from google_play_scraper import search, app
 import json
 import time
+import os
 
 def parse_downloads(installs_str):
     """Convert '1,000,000+' to integer 1000000"""
@@ -41,7 +42,11 @@ def search_and_filter_apps(keyword, max_results=30, min_downloads=100_000, min_r
 
     # Save results to file
     file_name = f"filtered_apps_{keyword.replace(' ', '_')}.json"
-    with open(file_name, 'w', encoding='utf-8') as f:
+    directory = 'data_scrapper/app_data'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    path = os.path.join(directory, file_name)
+    with open(path, 'w', encoding='utf-8') as f:
         json.dump(filtered_apps, f, ensure_ascii=False, indent=2)
 
     print(f"\n✅ Found {len(filtered_apps)} filtered apps. Saved to {file_name}")
