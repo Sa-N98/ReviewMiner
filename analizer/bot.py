@@ -38,6 +38,7 @@ class ReportGenerator:
     def __init__(self, jason_file_path):
         with open(jason_file_path, "r", encoding="utf-8") as file:
             self.data = json.load(file)
+        self.directory = "app_reports"
     
     def generate_report(self, country_code:str, rating:int):
         reviews = ''
@@ -47,13 +48,35 @@ class ReportGenerator:
 
          # Set the filename
         filename = f"report_{self.data['app_id']}_{country_code}_{rating}.md"
-        directory = "app_reports"
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        path = os.path.join(directory, filename)
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
+        path = os.path.join(self.directory, filename)
     # Open the file for writing
         with open(path, "w", encoding="utf-8") as f:
             # Stream output and write to file
             for chunk in chain.stream({"reviews": reviews}):
                 print(chunk.content, end="", flush=True)
                 f.write(chunk.content)
+
+    def generate_report_for_all_ratings(self, country_code:str):
+        all_rating_report = ''
+        if os.path.exists(self.directory):
+            for rating in range(5, 0, -1):
+                path = os.path.join(self.directory, f"report_{self.data['app_id']}_{country_code}_{rating}.md")
+                if os.path.exists(path):
+                    print(f"Adding Report for {country_code} with rating {rating}")
+                    all_rating_report += '\n\n' + '# Rating ' + str(rating) + '\n\n'
+                    with open(path, "r", encoding="utf-8") as file:
+                        all_rating_report += file.read() + '\n\n\n'
+        final_report_path = os.path.join(self.directory, f"report_{self.data['app_id']}_{country_code}_all_ratings.md")
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
+
+        with open(final_report_path, "w", encoding="utf-8") as f:
+            f.write(all_rating_report)
+
+                   
+
+
+
+
